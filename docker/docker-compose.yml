@@ -1,0 +1,58 @@
+version: '3.8'
+services:
+  phplab_app:
+    build:
+      context: ./php
+    container_name: phplab_app
+    working_dir: /var/www/html
+    volumes:
+      - ../src:/var/www/html
+      - ./php/php_default.ini:/usr/local/etc/php/conf.d/default.ini
+#    depends_on:
+#      - phplab_mariadb
+    networks:
+      - phplab_appnet
+
+  phplab_nginx:
+    image: nginx:alpine
+    container_name: phplab_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ../src:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - phplab_app
+    networks:
+      - phplab_appnet
+      
+#  phplab_mariadb:
+#    image: mariadb:latest
+#    container_name: phplab_mariadb
+#    restart: unless-stopped
+#    environment:
+#      MYSQL_DATABASE: phplab
+#      MYSQL_ROOT_PASSWORD: root
+#      MYSQL_USER: root
+#      MYSQL_PASSWORD: root
+#    ports:
+#      - "3306:3306"
+#    networks:
+#      - phplab_appnet
+#    volumes:
+#      - ../data/mysql:/var/lib/mysql          
+      
+#  phplab_adminer:
+#    image: adminer
+#    restart: always
+#    ports:
+#      - "8081:8080"
+#    depends_on:
+#      - phplab_mariadb
+#    networks:
+#      - phplab_appnet          
+
+networks:
+  phplab_appnet:
+    driver: bridge
+
